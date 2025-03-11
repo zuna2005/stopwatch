@@ -1,54 +1,29 @@
-# React + TypeScript + Vite
+# Stopwatch App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
+The Stopwatch App is a simple web-based timer application that allows users to manage multiple stopwatches simultaneously. Each stopwatch can be started, paused, resumed, cleared, or deleted individually. Additionally, users can delete all stopwatches at once.
 
-Currently, two official plugins are available:
+## Features
+- **Add Stopwatch** – Create a new stopwatch instance.
+- **Start Stopwatch** – Begin counting time.
+- **Pause Stopwatch** – Pause the running stopwatch.
+- **Resume Stopwatch** – Continue counting from where it was paused.
+- **Clear Stopwatch** – Reset the time to zero without deleting the stopwatch.
+- **Delete Stopwatch** – Remove an individual stopwatch.
+- **Delete All Stopwatches** – Remove all stopwatches at once.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Installation
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/zuna2005/stopwatch.git
+   ```
+2. Navigate to the project folder:
+   ```sh
+   cd stopwatch
+   ```
+3. Run the project using Vite's development server:
+   ```sh
+   npm install
+   npm run dev
+   ```
+   Then open the provided localhost URL in your web browser.
