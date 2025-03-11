@@ -1,7 +1,7 @@
 # Stopwatch App
 
 ## Description
-The Stopwatch App is a simple web-based timer application that allows users to manage multiple stopwatches simultaneously. Each stopwatch can be started, paused, resumed, cleared, or deleted individually. Additionally, users can delete all stopwatches at once.
+The Stopwatch App is a simple web-based timer application that allows users to manage multiple stopwatches simultaneously. Stopwatches are automatically saved in local storage, ensuring they persist across page reloads. Each stopwatch can be started, paused, resumed, cleared, or deleted individually. Additionally, users can delete all stopwatches at once.
 
 ## Features
 - **Add Stopwatch** – Create a new stopwatch instance.
@@ -11,6 +11,7 @@ The Stopwatch App is a simple web-based timer application that allows users to m
 - **Clear Stopwatch** – Reset the time to zero without deleting the stopwatch.
 - **Delete Stopwatch** – Remove an individual stopwatch.
 - **Delete All Stopwatches** – Remove all stopwatches at once.
+- **Persistent State** – Stopwatches are saved in local storage and persist across page reloads.
 
 ## Installation
 1. Clone the repository:
