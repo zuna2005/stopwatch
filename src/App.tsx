@@ -4,21 +4,32 @@ import Add from "./assets/add.svg";
 import Delete from "./assets/delete.svg";
 
 function App() {
-  const [stopwatches, setStopwatches] = useState<Array<number>>([]);
-  const [currentId, setCurrentId] = useState(0);
+  const prevStopwatches = localStorage.getItem("ids");
+  const prevCurrentId = localStorage.getItem("currentId") || "0";
+  localStorage.setItem("currentId", prevCurrentId);
+
+  const [stopwatches, setStopwatches] = useState<Array<number>>(prevStopwatches?.split(",").map(id => parseInt(id)) || []);
+  const [currentId, setCurrentId] = useState(parseInt(prevCurrentId));
 
   function handleAdd() {
-    setStopwatches([...stopwatches, currentId]);
+    const newStopwatches = [...stopwatches, currentId];
+    setStopwatches(newStopwatches);
     setCurrentId((prev) => prev + 1);
+    localStorage.setItem("ids", newStopwatches.join(","));
+    localStorage.setItem("currentId", (currentId + 1).toString());
   }
 
   function handleDelete(idToDelete: number) {
-    setStopwatches(stopwatches.filter((id) => id != idToDelete));
+    const newStopwatches = stopwatches.filter((id) => id != idToDelete);
+    setStopwatches(newStopwatches);
+    localStorage.setItem("ids", newStopwatches.join(","));
+    localStorage.removeItem(idToDelete.toString());
   }
 
   function handleDeleteAll() {
     setStopwatches([]);
     setCurrentId(0);
+    localStorage.clear();
   }
   return (
     <>

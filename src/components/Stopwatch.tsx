@@ -8,22 +8,32 @@ interface StopwatchProps {
 }
 
 const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
-  const [started, setStarted] = useState(false);
+  const prevTime = localStorage.getItem(id.toString()) || "0";
+  localStorage.setItem(id.toString(), prevTime);
+
+  const [started, setStarted] = useState(prevTime !== "0");
   const [running, setRunning] = useState(false);
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(parseInt(prevTime));
   const intervalId = useRef(0);
+
+  function updateTime() {
+    setTime((prev) => {
+      localStorage.setItem(id.toString(), (prev + 1).toString());
+      return (prev + 1);
+    }); 
+  }
 
   function handleStart() {
     setStarted(true);
     setRunning(true);
-    intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
+    intervalId.current = setInterval(updateTime, 10);
   }
   function handlePlay() {
     setRunning(!running);
     if (running) {
       clearInterval(intervalId.current);
     } else {
-      intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
+      intervalId.current = setInterval(updateTime, 10);
     }
   }
   function handleClear() {
@@ -31,6 +41,7 @@ const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
     setRunning(false);
     clearInterval(intervalId.current);
     setTime(0);
+    localStorage.setItem(id.toString(), "0");
   }
   return (
     <div className="stopwatch">
