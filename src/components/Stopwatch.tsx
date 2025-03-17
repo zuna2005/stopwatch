@@ -1,39 +1,37 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Delete from "../assets/delete-red.svg";
 import { convertTime } from "../helpers/timeConverter";
 
 interface StopwatchProps {
   id: number;
-  onDelete: (x: number) => void;
+  onDelete: (idToDelete: number) => void;
 }
 
 const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
   const prevTime = localStorage.getItem(id.toString()) || "0";
-  localStorage.setItem(id.toString(), prevTime);
 
   const [started, setStarted] = useState(prevTime !== "0");
   const [running, setRunning] = useState(false);
   const [time, setTime] = useState(parseInt(prevTime));
   const intervalId = useRef(0);
 
-  function updateTime() {
-    setTime((prev) => {
-      localStorage.setItem(id.toString(), (prev + 1).toString());
-      return (prev + 1);
-    }); 
-  }
+  useEffect(() => {
+    setTimeout(() => {
+      localStorage.setItem(id.toString(), time.toString());
+    }, 250);
+  }, [id, time]);
 
   function handleStart() {
     setStarted(true);
     setRunning(true);
-    intervalId.current = setInterval(updateTime, 10);
+    intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
   }
   function handlePlay() {
     setRunning(!running);
     if (running) {
       clearInterval(intervalId.current);
     } else {
-      intervalId.current = setInterval(updateTime, 10);
+      intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
     }
   }
   function handleClear() {
