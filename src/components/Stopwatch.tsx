@@ -8,43 +8,87 @@ interface StopwatchProps {
 }
 
 const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
-  const prevTime = localStorage.getItem(id.toString()) || "0";
-
-  const [started, setStarted] = useState(prevTime !== "0");
+  const [started, setStarted] = useState(false);
   const [running, setRunning] = useState(false);
-  const [time, setTime] = useState(parseInt(prevTime));
-  const intervalId = useRef(0);
+  const [time, setTime] = useState(0);
+
+  const intervalId = useRef<number | null>(null);
+  const deleteRef = useRef(false);
+  const timeRef = useRef(time);
+  const runningRef = useRef(running);
 
   useEffect(() => {
-    setTimeout(() => {
-      localStorage.setItem(id.toString(), time.toString());
-    }, 250);
-  }, [id, time]);
+    timeRef.current = time;
+    runningRef.current = running;
+  }, [time, running]);
+
+  useEffect(() => {
+    if (running)
+      intervalId.current = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 10);
+    else if (intervalId.current) clearInterval(intervalId.current);
+
+    return () => {
+      if (intervalId.current) clearInterval(intervalId.current);
+    };
+  }, [running]);
+
+  useEffect(() => {
+    const prevStopwatch = localStorage.getItem(id.toString());
+    if (prevStopwatch) {
+      const { prevTime, prevRunning, timestamp } = JSON.parse(prevStopwatch);
+      const prevFullTime = prevRunning
+        ? prevTime + (Date.now() - timestamp) / 10
+        : prevTime;
+      setStarted(prevTime !== 0);
+      setRunning(prevRunning);
+      setTime(prevFullTime);
+    }
+
+    const saveState = () => {
+      if (deleteRef.current) {
+        localStorage.removeItem(id.toString());
+        return;
+      }
+
+      const stopwatch = {
+        prevTime: timeRef.current,
+        prevRunning: runningRef.current,
+        timestamp: Date.now(),
+      };
+
+      localStorage.setItem(id.toString(), JSON.stringify(stopwatch));
+    };
+    window.addEventListener("beforeunload", saveState);
+
+    return () => window.removeEventListener("beforeunload", saveState);
+  }, [id]);
 
   function handleStart() {
     setStarted(true);
     setRunning(true);
-    intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
   }
+
   function handlePlay() {
-    setRunning(!running);
-    if (running) {
-      clearInterval(intervalId.current);
-    } else {
-      intervalId.current = setInterval(() => setTime((prev) => prev + 1), 10);
-    }
+    setRunning((prev) => !prev);
   }
+
   function handleClear() {
     setStarted(false);
     setRunning(false);
-    clearInterval(intervalId.current);
     setTime(0);
-    localStorage.setItem(id.toString(), "0");
   }
+
+  function handleDelete() {
+    deleteRef.current = true;
+    onDelete(id);
+  }
+
   return (
     <div className="stopwatch">
       <div className="delete-btn-container">
-        <img className="delete-btn" src={Delete} onClick={() => onDelete(id)} />
+        <img className="delete-btn" src={Delete} onClick={handleDelete} />
       </div>
       <h2>{convertTime(time)}</h2>
       {started ? (

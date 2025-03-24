@@ -1,7 +1,7 @@
 export function convertTime(time: number) {
-  const seconds = (time / 100) % 60;
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
+  const seconds = time / 100 % 60;
+  const minutes = Math.floor(time / 100 / 60 % 60);
+  const hours = Math.floor(time / 100 / 60 / 60 );
   return (
     (hours > 0 ? formatTime(hours, false) : "") +
     formatTime(minutes, false) +

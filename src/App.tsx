@@ -1,20 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Stopwatch from "./components/Stopwatch";
 import Add from "./assets/add.svg";
 import Delete from "./assets/delete.svg";
 
 function App() {
-  const prevStopwatches = JSON.parse(localStorage.getItem("ids") || "[]");
-  const prevCurrentId = parseInt(localStorage.getItem("currentId") || "0");
+  const [stopwatches, setStopwatches] = useState<Array<number>>([]);
+  const [currentId, setCurrentId] = useState(0);
 
-  const [stopwatches, setStopwatches] =
-    useState<Array<number>>(prevStopwatches);
-  const [currentId, setCurrentId] = useState(prevCurrentId);
+  const stopwatchesRef = useRef(stopwatches);
+  const currentIdRef = useRef(currentId);
 
   useEffect(() => {
-    localStorage.setItem("ids", JSON.stringify(stopwatches));
-    localStorage.setItem("currentId", currentId.toString());
+    stopwatchesRef.current = stopwatches;
+    currentIdRef.current = currentId;
   }, [stopwatches, currentId]);
+
+  useEffect(() => {
+    const prevStopwatches = localStorage.getItem("ids");
+    if (prevStopwatches) setStopwatches(JSON.parse(prevStopwatches));
+
+    const prevCurrentId = localStorage.getItem("currentId");
+    if (prevCurrentId) setCurrentId(parseInt(prevCurrentId));
+
+    const saveState = () => {
+      localStorage.setItem("ids", JSON.stringify(stopwatchesRef.current));
+      localStorage.setItem("currentId", currentIdRef.current.toString());
+    };
+    window.addEventListener("beforeunload", saveState);
+    return () => window.removeEventListener("beforeunload", saveState);
+  }, []);
 
   function handleAdd() {
     setStopwatches((prev) => [...prev, currentId]);
