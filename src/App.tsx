@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Stopwatch from "./components/Stopwatch";
+import { getPrevIds, saveIds } from "./helpers/localStorageUtils";
 import Add from "./assets/add.svg";
 import Delete from "./assets/delete.svg";
 
@@ -7,28 +8,20 @@ function App() {
   const [stopwatches, setStopwatches] = useState<Array<number>>([]);
   const [currentId, setCurrentId] = useState(0);
 
-  const stopwatchesRef = useRef(stopwatches);
-  const currentIdRef = useRef(currentId);
-
   useEffect(() => {
-    stopwatchesRef.current = stopwatches;
-    currentIdRef.current = currentId;
-  }, [stopwatches, currentId]);
-
-  useEffect(() => {
-    const prevStopwatches = localStorage.getItem("ids");
-    if (prevStopwatches) setStopwatches(JSON.parse(prevStopwatches));
-
-    const prevCurrentId = localStorage.getItem("currentId");
-    if (prevCurrentId) setCurrentId(parseInt(prevCurrentId));
-
-    const saveState = () => {
-      localStorage.setItem("ids", JSON.stringify(stopwatchesRef.current));
-      localStorage.setItem("currentId", currentIdRef.current.toString());
-    };
-    window.addEventListener("beforeunload", saveState);
-    return () => window.removeEventListener("beforeunload", saveState);
+    const prevStopwatches = getPrevIds();
+    if (prevStopwatches) {
+      setStopwatches(prevStopwatches);
+      setCurrentId(prevStopwatches.length);
+    }
   }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => saveIds(stopwatches);
+    
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [stopwatches]);
 
   function handleAdd() {
     setStopwatches((prev) => [...prev, currentId]);

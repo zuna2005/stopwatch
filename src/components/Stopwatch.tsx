@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Delete from "../assets/delete-red.svg";
 import { convertTime } from "../helpers/timeConverter";
+import { getPrevStopwatch, saveStopwatch } from "../helpers/localStorageUtils";
 
 interface StopwatchProps {
   id: number;
@@ -13,7 +14,6 @@ const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
   const [time, setTime] = useState(0);
 
   const intervalId = useRef<number | null>(null);
-  const deleteRef = useRef(false);
   const timeRef = useRef(time);
   const runningRef = useRef(running);
 
@@ -35,34 +35,19 @@ const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
   }, [running]);
 
   useEffect(() => {
-    const prevStopwatch = localStorage.getItem(id.toString());
+    const prevStopwatch = getPrevStopwatch(id);
     if (prevStopwatch) {
-      const { prevTime, prevRunning, timestamp } = JSON.parse(prevStopwatch);
-      const prevFullTime = prevRunning
-        ? prevTime + (Date.now() - timestamp) / 10
-        : prevTime;
-      setStarted(prevTime !== 0);
+      const { prevFullTime, prevRunning } = prevStopwatch;
+      setStarted(prevFullTime !== 0);
       setRunning(prevRunning);
       setTime(prevFullTime);
     }
 
-    const saveState = () => {
-      if (deleteRef.current) {
-        localStorage.removeItem(id.toString());
-        return;
-      }
-
-      const stopwatch = {
-        prevTime: timeRef.current,
-        prevRunning: runningRef.current,
-        timestamp: Date.now(),
-      };
-
-      localStorage.setItem(id.toString(), JSON.stringify(stopwatch));
-    };
-    window.addEventListener("beforeunload", saveState);
-
-    return () => window.removeEventListener("beforeunload", saveState);
+    const handleBeforeUnload = () =>
+      saveStopwatch(id, timeRef.current, runningRef.current);
+    
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [id]);
 
   function handleStart() {
@@ -80,15 +65,10 @@ const Stopwatch = ({ id, onDelete }: StopwatchProps) => {
     setTime(0);
   }
 
-  function handleDelete() {
-    deleteRef.current = true;
-    onDelete(id);
-  }
-
   return (
     <div className="stopwatch">
       <div className="delete-btn-container">
-        <img className="delete-btn" src={Delete} onClick={handleDelete} />
+        <img className="delete-btn" src={Delete} onClick={() => onDelete(id)} />
       </div>
       <h2>{convertTime(time)}</h2>
       {started ? (
